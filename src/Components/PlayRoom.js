@@ -18,6 +18,58 @@ const PlayRoom = (props) => {
 			socket.emit('client select path', { pathIndex: pathIndex });
 		}
 	}
+	const getStyleDot = (index) => {
+		let top0 = 150, left0 = 500;
+		let x = 30;
+		if (index === 0) return {top: top0, left: left0, position: 'absolute'}
+		let top, left;
+		if (1 <= index && index <= 7) {
+			top = top0 + x * (index - 1);
+			left = left0 + x;
+		} 
+		else if (8 <= index && index <= 13){
+			top = top0 + x * 6;
+			left = left0 + x * (index - 6)
+		}
+		else if (index === 14){
+			console.log('index', 14);
+			top = top0 + x * 7;
+			left = left0 + x * 7
+		}
+		else if (15 <= index && index <= 21){
+			top = top0 + x * 8;
+			left = left0 + x * (22 - index);
+		}
+		else if (22 <= index && index <= 27){
+			top = top0 + x * (index - 13);
+			left = left0 + x;
+		}
+		else if (index === 28){
+			top = top0 + x * 14;
+			left = left0
+		}
+		else if (29 <= index && index <= 35){
+			top = top0 + x * (43 - index);
+			left = left0 - x;
+		}
+		else if (36 <= index && index <= 41){
+			top = top0 + x * 8;
+			left = left0 - x * (index - 34);
+		}
+		else if (index === 42){
+			top = top0 + x * 7;
+			left = left0 - x * 7;
+		}
+		else if (43 <= index && index <= 49){
+			top = top0 + x * 6;
+			left = left0 - x * (50 - index)
+		}
+		else if (50 <= index && index <= 55){
+			top = top0 + x * (55 - index);
+			left = left0 - x;
+		}
+		return {top: `${top}px`, left: `${left}px`,  position: 'absolute'}
+	}
 	const getStylePlayer = (color) => {
 		if (color === 'red') return {
 			top: 200,
@@ -63,6 +115,19 @@ const PlayRoom = (props) => {
 	return (
 		<>
 			<div>PlayRoom</div>
+			<div style={{ display: 'relative' }}>
+				{playRoom?.dataBoard?.mainRoad?.map((item, index) => {
+					return <span key={index}
+						style={{
+							width: '20px', height: '20px',
+							border: '1px solid black', borderRadius: '10px', backgroundColor: item?.color, 
+							color: item?.color === 'yellow' || item?.color === 'red'? 'black' : 'white',
+							...getStyleDot(index)
+						}}>
+						{item !== null && <span><p>{item.index}</p></span>}
+					</span>
+				})}
+			</div>
 			<div style={{ textAlign: 'center' }}>
 				{dataBoard?.currentTurn?.socketId === socket.id
 					? <div>
@@ -89,6 +154,7 @@ const PlayRoom = (props) => {
 					</div>
 				}
 			</div>
+
 			{playRoom?.players?.map((item, index) => {
 				const style = getStylePlayer(item.color);
 				return <div key={index}
