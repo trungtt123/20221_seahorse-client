@@ -53,7 +53,7 @@ function Home(props) {
 	useEffect(() => {
 		if (isKicked) {
 			alert('Bạn đã bị kick khỏi phòng');
-			socket.emit('client leave wait room after kicked', {roomId: roomKick._id});
+			socket.emit('client leave wait room after kicked', { roomId: roomKick._id });
 		}
 	}, [isKicked])
 	return (
@@ -62,8 +62,14 @@ function Home(props) {
 			{listRoom?.map((room, index) => {
 				return <div key={room._id}>
 					<div>ID: {room._id}</div>
-					<div>{getSlotInRoom(room.players)}</div>
-					<button onClick={() => joinWaitRoom(room)}>Join room</button>
+					{
+						room.play
+							? <div>Game đã bắt đầu</div>
+							: <>
+								<div>{getSlotInRoom(room.players)}</div>
+								<button onClick={() => joinWaitRoom(room)}>Join room</button>
+							</>
+					}
 				</div>
 			})}
 		</div>

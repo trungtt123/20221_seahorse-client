@@ -27,6 +27,9 @@ function WaitRoom(props) {
 	const roomOwnerChangeTypePlayer = (type, playerIndex) => {
 		socket.emit('room owner change type player', { roomId: waitRoom._id, playerIndex: playerIndex, type });
 	}
+	const startGame = () => {
+		socket.emit('client start game');
+	}
 	useEffect(() => {
 		socket.on('wait room send player kick', (data) => {
 			if (data.message === 'success') {
@@ -45,7 +48,7 @@ function WaitRoom(props) {
 				setWaitRoom(data.room);
 			}
 			else {
-				//alert(data.reason);
+				alert(data.reason);
 			}
 		});
 		socket.on('server to client leave wait room', (data) => {
@@ -54,6 +57,21 @@ function WaitRoom(props) {
 				history.push('/');
 			}
 		});
+		socket.on('server start game', (data) => {
+			console.log(data);
+			if (data.message === 'success'){
+				// bat dau game
+				history.push({
+					pathname: '/play',
+					state: {
+						room: data.room
+					}
+				})
+			}
+			else {
+				alert(data.reason);
+			}
+		})
 	}, []);
 	console.log(waitRoom);
 	return (
@@ -68,14 +86,14 @@ function WaitRoom(props) {
 								<div>Player {index + 1}</div>
 								<div>Type: {item.type}</div>
 								<div>Đã khóa</div>
-								{player.username === waitRoom.owner ?
+								{player.username === waitRoom.owner.username ?
 									<button onClick={() => roomOwnerUnlockPlayer(index)}>Mở khóa</button>
 									: <></>}
 							</div>
 						} else return <div key={index} className="grid-item">
 							<div>Player {index + 1}</div>
 							<div>Type: {item.type}</div>
-							{player.username === waitRoom.owner ?
+							{player.username === waitRoom.owner.username ?
 								<>
 									
 									<select defaultValue="machine" onChange={(e) => roomOwnerChangeTypePlayer(e.target.value, index)}>
@@ -93,7 +111,7 @@ function WaitRoom(props) {
 								<div>{item.username}</div>
 								<div>Type: {item.type}</div>
 								<div>Đã khóa</div>
-								{player.username === waitRoom.owner ?
+								{player.username === waitRoom.owner.username ?
 									<button onClick={() => roomOwnerUnlockPlayer(index)}>Mở khóa</button>
 									: <></>}
 							</div>
@@ -101,9 +119,9 @@ function WaitRoom(props) {
 							<div>Player {index + 1}</div>
 							<div>{item.username}</div>
 							<div>Type: {item.type}</div>
-							<div>{item.username === waitRoom.owner ? 'Chủ phòng' : ''}</div>
-							{player.username === waitRoom.owner
-								&& item.username !== waitRoom.owner
+							<div>{item.username === waitRoom.owner.username ? 'Chủ phòng' : ''}</div>
+							{player.username === waitRoom.owner.username
+								&& item.username !== waitRoom.owner.username
 								&& item.username === null ?
 								<>
 									
@@ -114,8 +132,8 @@ function WaitRoom(props) {
 									<button onClick={() => roomOwnerBlockPlayer(index)}>Khóa</button>
 									
 								</> : <></>}
-							{player.username === waitRoom.owner
-								&& item.username !== waitRoom.owner
+							{player.username === waitRoom.owner.username
+								&& item.username !== waitRoom.owner.username
 								&& item.username !== null ?
 								<button onClick={() => roomOwnerKickPlayer(index)}>Kick</button>
 								: <></>}
@@ -124,6 +142,10 @@ function WaitRoom(props) {
 				})}
 
 			</div>
+			{
+				waitRoom.owner.socketId === socket.id &&
+				<button onClick={() => startGame()}>Bắt đầu</button>
+			}
 		</div>
 	);
 }

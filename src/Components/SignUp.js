@@ -7,7 +7,7 @@ const SignUp = (props) => {
     const [showError, setShowError] = useState(false);
     const [userName, setUserName] = useState();
     const register = () => {
-        socket.emit('client register', { username: userName, socketId: socket.id });
+        socket.emit('client register', { username: userName });
     }
     useEffect(() => {
         socket.on('server create user', (data) => {
