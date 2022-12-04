@@ -1,10 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import io from 'socket.io-client';
 import { useHistory, useLocation } from "react-router-dom";
-import ModalSignUp from './SignUp';
-import { API_URL } from '../constant';
-import { getPlayerInfo } from '../Services/common';
-
+import * as MESSAGE from '../Utils/constant';
 function WaitRoom(props) {
 	const socket = props.socket;
 	const { state } = useLocation();
@@ -12,26 +9,26 @@ function WaitRoom(props) {
 	const history = useHistory();
 	const player = props.player;
 	const playerLeaveRoom = () => {
-		socket.emit('client leave wait room');
+		socket.emit(MESSAGE.CLIENT_LEAVE_WAIT_ROOM);
 	}
 	const roomOwnerBlockPlayer = (playerIndex) => {
-		socket.emit('room owner block player', { roomId: waitRoom._id, playerIndex: playerIndex });
+		socket.emit(MESSAGE.ROOM_OWNER_BLOCK_PLAYER, { roomId: waitRoom._id, playerIndex: playerIndex });
 	}
 	const roomOwnerUnlockPlayer = (playerIndex) => {
 		console.log('playerIndex', playerIndex);
-		socket.emit('room owner unlock player', { roomId: waitRoom._id, playerIndex: playerIndex });
+		socket.emit(MESSAGE.ROOM_OWNER_UNLOCK_PLAYER, { roomId: waitRoom._id, playerIndex: playerIndex });
 	}
 	const roomOwnerKickPlayer = (playerIndex) => {
-		socket.emit('room owner kick player', { roomId: waitRoom._id, playerIndex: playerIndex });
+		socket.emit(MESSAGE.ROOM_OWNER_KICK_PLAYER, { roomId: waitRoom._id, playerIndex: playerIndex });
 	}
 	const roomOwnerChangeTypePlayer = (type, playerIndex) => {
-		socket.emit('room owner change type player', { roomId: waitRoom._id, playerIndex: playerIndex, type });
+		socket.emit(MESSAGE.ROOM_OWNER_CHANGE_TYPE_PLAYER, { roomId: waitRoom._id, playerIndex: playerIndex, type });
 	}
 	const startGame = () => {
-		socket.emit('client start game');
+		socket.emit(MESSAGE.CLIENT_START_GAME);
 	}
 	useEffect(() => {
-		socket.on('wait room send player kick', (data) => {
+		socket.on(MESSAGE.WAIT_ROOM_SEND_PLAYER_KICK, (data) => {
 			if (data.message === 'success') {
 				history.push({
 					pathname: '/',
@@ -42,7 +39,7 @@ function WaitRoom(props) {
 				})
 			}
 		})
-		socket.on('wait room send data', (data) => {
+		socket.on(MESSAGE.WAIT_ROOM_SEND_DATA, (data) => {
 			console.log('send');
 			if (data.message === 'success') {
 				setWaitRoom(data.room);
@@ -51,13 +48,13 @@ function WaitRoom(props) {
 				alert(data.reason);
 			}
 		});
-		socket.on('server to client leave wait room', (data) => {
+		socket.on(MESSAGE.SERVER_TO_CLIENT_LEAVE_WAIT_ROOM, (data) => {
 			//console.log(data);
 			if (data.message === 'success'){
 				history.push('/');
 			}
 		});
-		socket.on('server start game', (data) => {
+		socket.on(MESSAGE.SERVER_START_GAME, (data) => {
 			console.log(data);
 			if (data.message === 'success'){
 				// bat dau game

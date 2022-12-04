@@ -1,21 +1,18 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import io from 'socket.io-client';
 import { useHistory, useLocation } from "react-router-dom";
-import ModalSignUp from './SignUp';
-import { API_URL } from '../constant';
-import { getPlayerInfo } from '../Services/common';
-import { compareArraysAsSet } from '@testing-library/jest-dom/dist/utils';
+import * as MESSAGE from '../Utils/constant';
 const PlayRoom = (props) => {
 	const socket = props.socket;
 	const { state } = useLocation();
 	const [playRoom, setPlayRoom] = useState(state.room);
 	const [dataBoard, setDataBoard] = useState();
 	const spin = () => {
-		socket.emit('client spin');
+		socket.emit(MESSAGE.CLIENT_SPIN);
 	}
 	const selectPath = (pathIndex) => {
 		if (pathIndex !== 'x') {
-			socket.emit('client select path', { pathIndex: pathIndex });
+			socket.emit(MESSAGE.CLIENT_SELECT_PATH, { pathIndex: pathIndex });
 		}
 	}
 	const getStyleDot = (index) => {
@@ -97,7 +94,7 @@ const PlayRoom = (props) => {
 		}
 	}
 	useEffect(() => {
-		socket.on('play room send data', (data) => {
+		socket.on(MESSAGE.PLAY_ROOM_SEND_DATA, (data) => {
 			console.log('dataBoard', data?.room?.dataBoard);
 			if (data.message === 'success') {
 				let { dataBoard } = data.room;
@@ -121,7 +118,7 @@ const PlayRoom = (props) => {
 						style={{
 							width: '20px', height: '20px',
 							border: '1px solid black', borderRadius: '10px', backgroundColor: item?.color, 
-							color: item?.color === 'yellow' || item?.color === 'red'? 'black' : 'white',
+							color: 'black',
 							...getStyleDot(index)
 						}}>
 						{item !== null && <span><p>{item.index}</p></span>}

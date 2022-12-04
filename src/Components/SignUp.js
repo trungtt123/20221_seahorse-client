@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from "react";
 import Modal from 'react-modal';
-import { API_URL } from '../constant';
+import * as MESSAGE from '../Utils/constant';
 const SignUp = (props) => {
     const socket = props.socket;
     const [modalIsOpen, setIsOpen] = useState(true);
     const [showError, setShowError] = useState(false);
     const [userName, setUserName] = useState();
     const register = () => {
-        socket.emit('client register', { username: userName });
+        socket.emit(MESSAGE.CLIENT_REGISTER, { username: userName });
     }
     useEffect(() => {
-        socket.on('server create user', (data) => {
+        socket.on(MESSAGE.SERVER_CREATE_USER, (data) => {
             if (data.message === 'success') {
                 setIsOpen(false);
                 props.sendPlayerData(data.player);

@@ -5,9 +5,10 @@ import PlayRoom from "./Components/PlayRoom";
 import WaitRoom from "./Components/WaitRoom";
 import SignUp from "./Components/SignUp";
 import io from 'socket.io-client';
-import { API_URL } from './constant';
+import { API_URL } from './Utils/constant';
 import { useEffect } from "react";
 import { useState } from "react";
+import * as MESSAGE from './Utils/constant';
 const socket = io(API_URL);
 function App() {
   const history = useHistory();
@@ -23,7 +24,7 @@ function App() {
     socket.on('disconnect', () => {
       setIsConnected(false);
     });
-    socket.on('server send number of players', (data) => {
+    socket.on(MESSAGE.SERVER_SEND_NUMBER_OF_PLAYERS, (data) => {
       console.log(data);
       setNumberPlayer(data);
     })

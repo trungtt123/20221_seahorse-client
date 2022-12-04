@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import io from 'socket.io-client';
 import { useHistory, useLocation } from "react-router-dom";
+import * as MESSAGE from '../Utils/constant';
 function Home(props) {
 	const socket = props.socket;
 	const { state } = useLocation();
@@ -10,10 +11,10 @@ function Home(props) {
 	const roomKick = state?.roomKick;
 	const history = useHistory();
 	const createRoom = () => {
-		socket.emit('client create room');
+		socket.emit(MESSAGE.CLIENT_CREATE_ROOM);
 	}
 	const joinWaitRoom = (room) => {
-		socket.emit('client join wait room', { room });
+		socket.emit(MESSAGE.CLIENT_JOIN_WAIT_ROOM, { room });
 	}
 	const getSlotInRoom = (players) => {
 		let d = 0;
@@ -26,13 +27,13 @@ function Home(props) {
 		return `Còn ${d} ${d === 1 ? 'slot' : 'slots'}`;
 	}
 	useEffect(() => {
-		socket.on('server create room', (data) => {
+		socket.on(MESSAGE.SERVER_CREATE_ROOM, (data) => {
 			if (data.message === 'success') {
 				joinWaitRoom(data.room);
 			}
 		});
 
-		socket.on('server to client joined wait room', (data) => {
+		socket.on(MESSAGE.SERVER_TO_CLIENT_JOINED_WAIT_ROOM, (data) => {
 			//console.log(data);
 			if (data.message === 'success') {
 				history.push({
@@ -44,7 +45,7 @@ function Home(props) {
 			}
 		});
 
-		socket.on('server send list wait room', (data) => {
+		socket.on(MESSAGE.SERVER_SEND_LIST_WAIT_ROOM, (data) => {
 			if (data.message === 'success') {
 				setListRoom(data.rooms);
 			}
@@ -53,7 +54,7 @@ function Home(props) {
 	useEffect(() => {
 		if (isKicked) {
 			alert('Bạn đã bị kick khỏi phòng');
-			socket.emit('client leave wait room after kicked', { roomId: roomKick._id });
+			socket.emit(MESSAGE.CLIENT_LEAVE_WAIT_ROOM_AFTER_KICKED, { roomId: roomKick._id });
 		}
 	}, [isKicked])
 	return (
